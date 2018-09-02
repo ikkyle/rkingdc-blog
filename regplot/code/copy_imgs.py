@@ -19,9 +19,10 @@ any_error = list(filter(lambda x: not x.startswith('none_'), files))
 
 def indx12(samp, n1, n2):
     idx0 = random.sample(list(range(len(samp))), n1+n2)
-    idx1 = idx0[:n1]   
+    idx1 = idx0[:n1]
+    del idx0[:n1]
     samp1 = [s for i,s in enumerate(samp) if i in idx1]
-    samp2 = [s for i,s in enumerate(samp) if i not in idx1]
+    samp2 = [s for i,s in enumerate(samp) if i in idx0]
     return samp1, samp2
 
 def cpytest(x, source_dir='data/png'):
