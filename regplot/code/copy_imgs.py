@@ -24,18 +24,18 @@ def indx12(samp, n1, n2):
     samp2 = [s for i,s in enumerate(samp) if i not in idx1]
     return samp1, samp2
 
-def cpyfun(x, dest, source_dir='data/png'):
-    copy(os.path.join(source_dir, x), dest)
-
+def cpytest(x, source_dir='data/png'):
+    copy(os.path.join(source_dir, x), dest='data/imgs/test')
+def cpytrain(x, source_dir='data/png'):
+    copy(os.path.join(source_dir, x), dest='data/imgs/train')
     
 if __name__ == '__main__':
 
     train_none, test_none = indx12(none, n_train, n_test)
     train_any, test_any = indx12(any_error, n_train, n_test)
     
-    p = Pool(3)
-
-    print("Copying Training set...")
-    p.map(lambda x: cpyfun(x, train_dir), train_none+train_any)
-    print("Copying test set...")
-    p.map(lambda x: cpyfun(x, test_dir), test_none+test_any)
+    with Pool(3) as p:
+        print("Copying Training set...")
+        p.map(cpytrain,train_none+train_any)
+        print("Copying test set...")
+        p.map(cpytest, test_none+test_any)
