@@ -25,9 +25,9 @@ def indx12(samp, n1, n2):
     return samp1, samp2
 
 def cpytest(x, source_dir='data/png'):
-    copy(os.path.join(source_dir, x), dest='data/imgs/test')
+    copy(os.path.join(source_dir, x), 'data/imgs/test')
 def cpytrain(x, source_dir='data/png'):
-    copy(os.path.join(source_dir, x), dest='data/imgs/train')
+    copy(os.path.join(source_dir, x), 'data/imgs/train')
     
 if __name__ == '__main__':
 
