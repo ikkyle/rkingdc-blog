@@ -16,7 +16,8 @@ test_dir = 'data/imgs/test'
 files = os.listdir(source_dir)
 
 none = list(filter(lambda x: x.startswith('none_'), files))
-any_error = list(filter(lambda x: not x.startswith('none_'), files))
+#any_error = list(filter(lambda x: not x.startswith('none_'), files))
+any_error = list(filter(lambda x: x.startswith('ceiling_'), files))
 
 def indx12(samp, n1, n2):
     idx0 = random.sample(list(range(len(samp))), n1+n2)
@@ -35,9 +36,9 @@ train_any, test_any = indx12(any_error, n_train, n_test)
 
 with Pool(3) as p:
     print("Copying Training controls...")
-    p.map(partial(cpyfile,dest=os.path.join(train_dir, 'none')), train_none)
+    #p.map(partial(cpyfile,dest=os.path.join(train_dir, 'none')), train_none)
     p.map(partial(cpyfile,dest=os.path.join(train_dir, 'any_error')), train_any)  
     
     print("Copying test set...")
-    p.map(partial(cpyfile,dest=os.path.join(test_dir, 'none')), test_none)
+    #p.map(partial(cpyfile,dest=os.path.join(test_dir, 'none')), test_none)
     p.map(partial(cpyfile,dest=os.path.join(test_dir, 'any_error')), test_any)     
