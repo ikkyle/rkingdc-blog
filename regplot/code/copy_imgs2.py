@@ -36,6 +36,6 @@ def doit(name, pool, outdir, imgs, n_train=8000, n_test=2000):
 
 with Pool(4) as p:
     doit('none', p, outdir=out_dir, imgs=files, n_train=16000, n_test=4000)
-   # doit('ceiling', p, outdir=out_dir, imgs=files)
-   # doit('outlier', p, outdir=out_dir, imgs=files)
-   # doit('biased', p, outdir=out_dir, imgs=files)
+    #doit('ceiling', p, outdir=out_dir, imgs=files)
+    #doit('outlier', p, outdir=out_dir, imgs=files)
+    #doit('biased', p, outdir=out_dir, imgs=files)
