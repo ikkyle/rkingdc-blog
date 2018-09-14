@@ -90,25 +90,23 @@ make_ctrl_df <- function(n, type, outpath){
 }
 
 ### create dataframe with training info:
-outpath <- 'data/png'
+outpath <- 'data/holdout_pngs'
 ctrl_df <- rbind(
-  make_ctrl_df(30000, type='none', outpath=outpath),
-  make_ctrl_df(10000, type='biased', outpath=outpath),
-  make_ctrl_df(10000, type='outlier', outpath=outpath),
-  make_ctrl_df(10000, type='ceiling', outpath=outpath)
+  make_ctrl_df(1000, type='none', outpath=file.path(outpath, 'none')),
+  make_ctrl_df(1000, type='biased', outpath=file.path(outpath, 'biased')),
+  make_ctrl_df(1000, type='outlier', outpath=file.path(outpath, 'outlier')),
+  make_ctrl_df(1000, type='ceiling', outpath=file.path(outpath, 'ceiling'))
 )
 
-write.csv(ctrl_df, file = 'data/control_file.csv', row.names=FALSE)
+#write.csv(ctrl_df, file = 'data/control_file.csv', row.names=FALSE)
 
-res <- mcmapply(
+res <- mapply(
   FUN = parms_to_plot,
   n = ctrl_df$n,
   n_predictors = ctrl_df$n_predictors,
   n_controls = ctrl_df$n_controls,
   messup = ctrl_df$type,
-  outfile = ctrl_df$filename,
-  mc.cores=3,
-  mc.preschedule=TRUE
+  outfile = ctrl_df$filename
 )
 
 
