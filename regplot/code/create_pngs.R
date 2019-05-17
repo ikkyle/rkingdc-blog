@@ -100,13 +100,14 @@ ctrl_df <- rbind(
 
 #write.csv(ctrl_df, file = 'data/control_file.csv', row.names=FALSE)
 
-res <- mapply(
+res <- mcmapply(
   FUN = parms_to_plot,
   n = ctrl_df$n,
   n_predictors = ctrl_df$n_predictors,
   n_controls = ctrl_df$n_controls,
   messup = ctrl_df$type,
-  outfile = ctrl_df$filename
+  outfile = ctrl_df$filename,
+    mc.cores=4
 )
 
 
