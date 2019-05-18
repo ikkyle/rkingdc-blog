@@ -6,7 +6,7 @@ import pickle
 
 from textacy import make_spacy_doc
 
-from multiprocessing import Pool
+from multiprocessing.pool import ThreadPool
 
 import mwparserfromhell as mwp
 
@@ -80,11 +80,11 @@ def mkdoc(file):
     
     
     # docs can't be > 1 million chars
-    doc = [textacy.doc.make_spacy_doc(txt[:1_000_000-1])]
+    doc = [textacy.doc.make_spacy_doc(txt[:1_000_000-1], lang='en')]
     if len(doc) > 1e6:
-        doc += [textacy.doc.make_spacy_doc(txt[1_000_000:2_000_000-1], disable = ['tagger', 'parser', 'ner', 'textcat'])]
+        doc += [textacy.doc.make_spacy_doc(txt[1_000_000:2_000_000-1], lang='en')]
     if len(doc) > 2e6:
-        doc += [textacy.doc.make_spacy_doc(txt[2_000_000:3_000_000-1], disable = ['tagger', 'parser', 'ner', 'textcat'])]
+        doc += [textacy.doc.make_spacy_doc(txt[2_000_000:3_000_000-1], lang='en')]
 
     return doc
 
@@ -110,6 +110,6 @@ if __name__ == '__main__':
             dirs.append(os.path.join(datadir, dir_, file))
     
     
-    with Pool(8) as pool:
+    with ThreadPool(8) as pool:
         pool.map(_runner, dirs)
 
