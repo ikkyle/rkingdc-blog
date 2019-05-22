@@ -9,6 +9,8 @@ from scipy import sparse
 from operator import itemgetter
 from google.cloud import storage
 
+from corpus_to_dtm import write_numpy_blob
+
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/home/roz/share/rkingdc-blog/erudite-flag-214115-6984f327da68.json'
 
 def read_blob_pickle(blob):
@@ -71,4 +73,10 @@ if __name__ == '__main__':
     
     # convert DTM to TF-IDF matrix
     tfidf = compute_tfidf(mat = dtm)
+    
+    write_numpy_blob(
+        obj=tfidf,
+        path=os.path.join(blob_root, 'tfidf_matrix.jblb'),
+        bucket=bucket
+    )
     
