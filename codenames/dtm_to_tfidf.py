@@ -27,7 +27,7 @@ def read_blob_joblib(blob):
 
 def compute_tfidf(mat):
     inv_term_count = sparse.bsr_matrix(1/mat.sum(axis=1))
-    term_freq = mat.multiply(term_count)
+    term_freq = mat.multiply(inv_term_count)
     
     n_documents = mat.shape[1]
     n_documents_with_term = mat.getnnz(axis=1)
