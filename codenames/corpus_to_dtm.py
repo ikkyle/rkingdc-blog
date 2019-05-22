@@ -28,22 +28,22 @@ class BlobDoc(object):
         self.word_map = {}
         self.map_counter = -1 # so the first value is zero
         self.max_results = max_results
-        self.iter_int = True
-        #import textacy # so unpickle works
         
     def __iter__(self):
-        if not self.iter_int:
-            print("Returning string-based BOW!")
         for blob in tqdm(self.bucket.list_blobs(prefix=self.doc_prefix, max_results=self.max_results)):
             for doc in self.read_blob(blob):
-                bow = self.doc2bow(doc)
-                if self.iter_int:
-                    bow = self.update_word_map(bow)
-                yield bow.items()
+                if doc is None: continue 
+                bow_t = self.doc2bow(doc)
+                bow_i = self.update_word_map(bow_t)
+                yield bow_i.items()
 
             
     def read_blob(self, blob):
-        pkl = blob.download_as_string()
+        try:
+            pkl = blob.download_as_string()
+        except google.resumable_media.common.DataCorruption:
+            print("Skipping %s" % str(blob.name))
+            return None
         docs = pickle.loads(pkl)
         name = blob.name
         categ = os.path.basename(name).split('__')[0]
@@ -79,9 +79,10 @@ def write_numpy_blob(obj, path, bucket):
     dest.upload_from_filename(path)
     
 def write_blob(obj, path, bucket):
-    pickle.dump(obj, file = path, protocol=3)
+    with open(path, 'wb') as f:
+        pickle.dump(obj, file = f, protocol=3)
     dest = bucket.blob(path)
-    dest.upload_from_filename(pkl)
+    dest.upload_from_filename(path)
 
 def exists_blob(path, bucket):
     return bucket.blob(path).exists()
@@ -94,17 +95,22 @@ if __name__ == '__main__':
     
     bd = BlobDoc(max_results=None)
     
+    print("Creating document-term-matrix...")
     doc_term_matrix = gensim.matutils.corpus2csc(corpus = iter(bd))
     
+    print('Writing DTM...')
     write_numpy_blob(obj=doc_term_matrix, 
                path = os.path.join(outdir, 'doc_term_matrix.jblb'), 
                bucket = bd.bucket)
+    print("Writing map...")
     write_blob(bd.word_map, 
                path = os.path.join(outdir, 'word_map.pkl'),
                bucket = bd.bucket)
+    print("Writing file list...")
     write_blob(bd.files, 
                path = os.path.join(outdir, 'files.pkl'),
                bucket = bd.bucket)
+    print("Writing categories...")
     write_blob(bd.categories, 
                path = os.path.join(outdir, 'categories.pkl'),
                bucket = bd.bucket)

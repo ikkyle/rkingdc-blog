@@ -23,6 +23,7 @@ tornado = "<6"
 joblib = "*"
 googleappenginecloudstorageclient = "*"
 google-cloud-storage = "*"
+google-resumable-media = "*"
 
 [requires]
 python_version = "3.7"
