@@ -4,6 +4,7 @@ import pickle
 import itertools
 import gensim
 import joblib
+import hunspell
 
 from tqdm import tqdm
 
@@ -13,6 +14,8 @@ from gensim.models import TfidfModel
 from google.cloud import storage
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/home/roz/share/rkingdc-blog/erudite-flag-214115-6984f327da68.json'
+
+hobj = hunspell.HunSpell('/usr/share/hunspell/en_US.dic', '/usr/share/hunspell/en_US.aff')
 
 class BlobDoc(object):
     
@@ -53,17 +56,19 @@ class BlobDoc(object):
 
     def doc2bow(self, doc):
         bow = doc._.to_bag_of_terms(
-          ngrams=1,
+            ngrams=1,
             filter_stops=True,
             filter_punct=True,
             normalize='lemma',
-          weighting='count',
-          as_strings=True)
+            weighting='count',
+            as_strings=True)
         return bow
     
     def update_word_map(self, bow):
         new_bow = {}
         for bow_word, bow_value in bow.items():
+            # only include english words
+            if not hobj.spell(bow_word.encode('utf-8')): continue
             if bow_word not in self.word_map.keys():
                 self.map_counter += 1
                 self.word_map[bow_word] = self.map_counter

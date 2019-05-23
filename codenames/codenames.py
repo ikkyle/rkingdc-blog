@@ -1,4 +1,6 @@
 import random
+import unicodedata
+import string
 
 with open('data/wordlist.txt', 'r') as wf:
     codewords = wf.read().splitlines()

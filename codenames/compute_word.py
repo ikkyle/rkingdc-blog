@@ -1,6 +1,7 @@
 import os 
 import joblib
 import pickle
+import hunspell
 
 import numpy as np
 
@@ -11,6 +12,7 @@ from google.cloud import storage
 
 from dtm_to_tfidf import read_blob_pickle, read_blob_joblib
 
+hobj = hunspell.HunSpell('/usr/share/hunspell/en_US.dic', '/usr/share/hunspell/en_US.aff')
 
 class Board(object):
     def __init__(self, tfidf, word_map, categories, 
@@ -18,7 +20,9 @@ class Board(object):
         if not board or not red or not blue or not black:
             board, red, blue, black = cdn.create_game(cdn.codewords)
 
-        self.word_map = word_map
+        word_map_en = {k: word_map[k] if hobj.spell(k.encode('utf-8')) \
+                       else None for k in word_map.keys()}
+        self.word_map = word_map_en
         self.categories= categories
         self.board = [x.lower() for x in board]
         self.red = [x.lower() for x in red]
@@ -29,7 +33,9 @@ class Board(object):
     def subset_tfidf(self, target_categories):
         tc = [x.lower() for x in target_categories]
         col_idx = [i for i,x in enumerate(self.categories) if x.lower() in tc]
+        row_idx = [i for i in self.word_map.values() if i]
         sub_tfidf = self.tfidf[..., col_idx]
+        sub_tfidf = sub_tfidf[row_idx, ...]
         return sub_tfidf
     
     def compute_candidates(self, red_tfidf, blue_tfidf, black_tfidf=None):
@@ -74,8 +80,8 @@ if __name__ == '__main__':
     red = ['Post','Chocolate', 'Chest', 'Night', 'Microscope', 'Chair','Iron','England']
     blue = ['Charge', 'India', 'Aztec', 'Bed', 'Oil', 'Ice', 'Boot']
     black = ['Mug']
-    board = ['England','India','Egypt','Chest','Dice',
- 'Heart','Soul','Charge','Microscope','Post','Bed','Night','Oil','Iron','Hand',
+    board = ['England','India','Egypt','Chest','Dice',\
+ 'Heart','Soul','Charge','Microscope','Post','Bed','Night','Oil','Iron','Hand',\
  'Boot','Chair','Mug','Chocolate','Ice','Aztec','Wall','Pheonix','Ground','Press']
     
     words_to_cluster = ['Iron', 'Chair', 'England']
@@ -89,5 +95,5 @@ if __name__ == '__main__':
         blue = blue,
         black = black)
     
-    B.word_for_red_cluster(['Chair', 'England'])
+    B.word_for_red_cluster(['Microscope', 'Iron'])
     
